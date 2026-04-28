@@ -55,8 +55,7 @@ npm run preview
 │   ├── main.css             # Main stylesheet
 │   ├── Words.json           # Flat array of common words
 │   └── WordList.json        # 26 arrays of words keyed by letter (A-Z)
-├── index.html               # Single-page application entry point
-└── AGENTS.md                # Agent guide for development
+└── index.html               # Single-page application entry point
 ```
 
 ## Data Files
