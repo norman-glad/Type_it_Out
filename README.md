@@ -2,6 +2,8 @@
 
 Browser-based typing speed trainer with adaptive word selection. A fully static single-page application — no backend required.
 
+**Live demo**: [type-it-out-delta.vercel.app](https://type-it-out-delta.vercel.app/)
+
 ## Features
 
 - **Real-time typing practice** with instant feedback
@@ -67,15 +69,6 @@ npm run preview
 - **Dev server**: `npm run dev` — Starts Vite dev server with HMR on port 5173
 - **Type check**: `npx tsc --noEmit` — Checks TypeScript compilation without emitting files
 - **Build**: `npm run build` — Compiles TypeScript and bundles for production
-
-## Deployment
-
-The `dist/` folder contains the fully static site ready for deployment to any CDN or static hosting service:
-- Netlify
-- Vercel
-- GitHub Pages
-- Cloudflare Pages
-- Or any web server capable of serving static files
 
 ## License
 
