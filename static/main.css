@@ -1,0 +1,360 @@
+:root {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #141414;
+  --text-primary: #ededed;
+  --text-secondary: #a1a1aa;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --success: #22c55e;
+  --error: #ef4444;
+  --border: #27272a;
+  --font-mono: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', 'Lucida Console', Monaco, monospace;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+nav {
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 2rem;
+}
+
+.masterContentBox {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+nav .masterContentBox {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#logoTxt {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.2s ease;
+}
+
+#logoTxt:hover {
+  opacity: 0.8;
+}
+
+#startingLetterLogo {
+  background-color: var(--accent);
+  color: white;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+#typingPlace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  min-height: 400px;
+}
+
+#typeText {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  width: 100%;
+  max-width: 900px;
+  min-height: 120px;
+  padding: 1.5rem;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  user-select: none;
+  letter-spacing: 0.02em;
+  overflow-y: hidden;
+  position: relative;
+}
+
+#typeText::before {
+  content: '';
+  position: absolute;
+  left: 1.5rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--accent);
+  opacity: 0.5;
+}
+
+#typeTextBox {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  width: 100%;
+  max-width: 900px;
+  padding: 1rem 1.5rem;
+  margin-top: 2rem;
+  background-color: var(--bg-secondary);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#typeTextBox:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+word {
+  display: inline-block;
+  padding: 0.1em 0.2em;
+  margin: 0 0.1em;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+word.current {
+  background-color: var(--bg-primary);
+  box-shadow: 0 0 0 2px var(--accent);
+  color: var(--text-primary);
+}
+
+word.correct {
+  color: var(--success);
+}
+
+word.wrong {
+  color: var(--error);
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+span.wrong {
+  color: var(--error);
+  font-weight: 600;
+}
+
+span.current {
+  color: var(--text-primary);
+  background-color: var(--accent);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+span.correct {
+  color: var(--success);
+}
+
+#charList {
+  display: none;
+  width: 100%;
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#charList.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.char {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.char:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.char:active {
+  transform: translateY(0);
+}
+
+#results {
+  display: none;
+  width: 100%;
+  max-width: 900px;
+  margin: 2rem auto;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#results.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#continuePrompt {
+  width: 100%;
+  max-width: 900px;
+  margin: 1.5rem auto 0;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.resultBox {
+  flex: 1;
+  min-width: 300px;
+  padding: 2rem;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.resultBox h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0.75rem;
+}
+
+.statisticDiv {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.statisticDiv:last-child {
+  border-bottom: none;
+}
+
+.statisticLabel {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.statistic {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+#correctWords,
+#correctChars {
+  color: var(--success);
+}
+
+#wrongWords,
+#wrongChars {
+  color: var(--error);
+}
+
+#charName {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  nav {
+    padding: 0.75rem 1rem;
+  }
+
+  #logoTxt {
+    font-size: 1.25rem;
+  }
+
+  #startingLetterLogo {
+    width: 32px;
+    height: 32px;
+    font-size: 1.1rem;
+  }
+
+  #typeText {
+    font-size: 1.5rem;
+    padding: 1rem;
+  }
+
+  #typeTextBox {
+    font-size: 1.25rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .char {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .resultBox {
+    min-width: 100%;
+    padding: 1.5rem;
+  }
+}
