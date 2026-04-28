@@ -2,7 +2,7 @@
 
 Browser-based typing speed trainer with adaptive word selection. A fully static single-page application — no backend required.
 
-**Live demo**: [type-it-out-delta.vercel.app](https://type-it-out-delta.vercel.app/)
+**Live**: [type-it-out-delta.vercel.app](https://type-it-out-delta.vercel.app/)
 
 ## Features
 
