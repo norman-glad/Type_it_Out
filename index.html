@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Type It Out — Typing Speed Trainer</title>
+  <link rel="stylesheet" href="/main.css">
+</head>
+<body>
+  <nav>
+    <div class="masterContentBox">
+      <a href="/" id="logoTxt">
+        <span id="startingLetterLogo">T</span>
+        <span>ype It Out</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="masterContentBox">
+    <div id="typingPlace">
+      <div id="typeText"></div>
+      <input type="text" id="typeTextBox" autofocus placeholder="Start typing..." autocomplete="off">
+    </div>
+
+    <div id="charList"></div>
+
+    <div id="results">
+      <div class="resultBox">
+        <h3>Word Statistics</h3>
+        <div class="statisticDiv">
+          <span class="statisticLabel">Speed (WPM)</span>
+          <span class="statistic" id="wordSpeed">0</span>
+        </div>
+        <div class="statisticDiv">
+          <span class="statisticLabel">Accuracy</span>
+          <span class="statistic" id="wordAccuracy">0%</span>
+        </div>
+        <div class="statisticDiv">
+          <span class="statisticLabel">Correct</span>
+          <span class="statistic" id="correctWords">0</span>
+        </div>
+        <div class="statisticDiv">
+          <span class="statisticLabel">Wrong</span>
+          <span class="statistic" id="wrongWords">0</span>
+        </div>
+      </div>
+      <div class="resultBox">
+        <h3>Character Stats — <span id="charName">A</span></h3>
+        <div class="statisticDiv">
+          <span class="statisticLabel">Speed (CPM)</span>
+          <span class="statistic" id="charSpeed">0</span>
+        </div>
+        <div class="statisticDiv">
+          <span class="statisticLabel">Accuracy</span>
+          <span class="statistic" id="charAccuracy">0%</span>
+        </div>
+        <div class="statisticDiv">
+          <span class="statisticLabel">Correct</span>
+          <span class="statistic" id="correctChars">0</span>
+        </div>
+        <div class="statisticDiv">
+          <span class="statisticLabel">Wrong</span>
+          <span class="statistic" id="wrongChars">0</span>
+        </div>
+      </div>
+
+      <div id="continuePrompt">Press any key to continue...</div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
