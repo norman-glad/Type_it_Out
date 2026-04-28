@@ -13,6 +13,7 @@ let startingTime: number = -1;
 let passageCount: number = 0;
 let isViewingResults: boolean = false;
 let toastTimeout: number | null = null;
+let wordCount: number = 50;
 
 async function initialize(): Promise<void> {
   typeTextBox = document.querySelector("#typeTextBox") as HTMLInputElement;
@@ -22,6 +23,7 @@ async function initialize(): Promise<void> {
     return;
   }
 
+  setupWordCountSelector();
   resetTimePressedArray();
   typeTextBox.addEventListener("input", onInput);
 
@@ -100,6 +102,26 @@ function resetTimePressedArray(): void {
   }
 }
 
+function setupWordCountSelector(): void {
+  const buttons = document.querySelectorAll('.wc-btn') as NodeListOf<HTMLButtonElement>;
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const count = parseInt(btn.dataset.count!);
+      if (count === wordCount) return;
+
+      wordCount = count;
+
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      if (!isViewingResults) {
+        loadNewPassage();
+      }
+    });
+  });
+}
+
 function generateSortedCharList(passageResult: PassageResult): void {
   const charList = document.getElementById("charList");
   if (!charList) return;
@@ -175,7 +197,7 @@ function hideToast(): void {
 
 async function loadNewPassage(): Promise<void> {
   const weakestChars = sessionTracker.getWeakestChars(3);
-  await passageHandler.getPassage(weakestChars);
+  await passageHandler.getPassage(weakestChars, wordCount);
 
   wordIndex = 0;
   lastInput = "";
@@ -184,6 +206,7 @@ async function loadNewPassage(): Promise<void> {
   resetTimePressedArray();
 
   hideResults();
+  showTypingPlace();
   typeTextBox.focus();
 }
 
@@ -219,7 +242,10 @@ function moveToNextWord(userInput: string): void {
   lastInput = "";
 
   wordIndex++;
-  if (wordIndex >= passageHandler.wordTags.length) return;
+  if (wordIndex >= passageHandler.wordTags.length) {
+    finishPassage();
+    return;
+  }
 
   passageHandler.formatWordTagAsCurrent(wordIndex);
 }
@@ -253,6 +279,8 @@ function displayResults(passageResult: PassageResult): void {
   generateSortedCharList(passageResult);
   updateCharStatsDisplay(0, passageResult);
   showToast("Press spacebar to continue");
+
+  hideTypingPlace();
 
   const charList = document.getElementById("charList")!;
   const results = document.getElementById("results")!;
@@ -289,6 +317,16 @@ function hideResults(): void {
   }, 300);
 }
 
+function showTypingPlace(): void {
+  const typingPlace = document.getElementById("typingPlace")!;
+  typingPlace.classList.remove("hidden");
+}
+
+function hideTypingPlace(): void {
+  const typingPlace = document.getElementById("typingPlace")!;
+  typingPlace.classList.add("hidden");
+}
+
 async function hideResultsAndContinue(): Promise<void> {
   hideToast();
 
@@ -308,6 +346,7 @@ async function hideResultsAndContinue(): Promise<void> {
 
   isViewingResults = false;
   typeTextBox.disabled = false;
+  showTypingPlace();
 
   await loadNewPassage();
 }
