@@ -12,62 +12,27 @@ let timePressed: Array<Array<number>> = [];
 let startingTime: number = -1;
 let passageCount: number = 0;
 let isViewingResults: boolean = false;
+let toastTimeout: number | null = null;
 
 async function initialize(): Promise<void> {
   typeTextBox = document.querySelector("#typeTextBox") as HTMLInputElement;
-
 
   if (!typeTextBox) {
     console.error('Type textbox not found');
     return;
   }
 
-  generateCharList();
   resetTimePressedArray();
-
   typeTextBox.addEventListener("input", onInput);
 
   await loadNewPassage();
 
   window.addEventListener('keydown', (e) => {
-    if (isViewingResults) return;
-
     if (e.key === 'Tab') {
       e.preventDefault();
       typeTextBox.focus();
     }
   });
-}
-
-function generateCharList(): void {
-  const charList = document.getElementById("charList");
-  if (!charList) return;
-
-  charList.innerHTML = '';
-  for (let i = 0; i < 26; i++) {
-    const char = String.fromCharCode(65 + i);
-    const charDiv = document.createElement("div");
-    charDiv.className = "char";
-    charDiv.textContent = char;
-    charDiv.addEventListener("click", () => {
-      updateCharStatsDisplay(i);
-    });
-    charList.appendChild(charDiv);
-  }
-}
-
-async function loadNewPassage(): Promise<void> {
-  const weakestChars = sessionTracker.getWeakestChars(3);
-  await passageHandler.getPassage(weakestChars);
-
-  wordIndex = 0;
-  lastInput = "";
-  startingTime = -1;
-  typeTextBox.value = "";
-  resetTimePressedArray();
-
-  hideResults();
-  typeTextBox.focus();
 }
 
 function onInput(e: Event): void {
@@ -135,12 +100,101 @@ function resetTimePressedArray(): void {
   }
 }
 
+function generateSortedCharList(passageResult: PassageResult): void {
+  const charList = document.getElementById("charList");
+  if (!charList) return;
+
+  const charData: Array<{ charIndex: number; char: string; wrongCount: number; accuracy: number }> = [];
+
+  for (let i = 0; i < 26; i++) {
+    const char = String.fromCharCode(65 + i);
+    const correct = passageResult.correctChars[i];
+    const wrong = passageResult.wrongChars[i];
+    const total = correct + wrong;
+    const accuracy = total > 0 ? (correct / total) * 100 : 100;
+
+    charData.push({ charIndex: i, char, wrongCount: wrong, accuracy });
+  }
+
+  charData.sort((a, b) => {
+    if (b.wrongCount !== a.wrongCount) {
+      return b.wrongCount - a.wrongCount;
+    }
+    return a.accuracy - b.accuracy;
+  });
+
+  charList.innerHTML = '';
+  charData.forEach(({ charIndex, char, wrongCount, accuracy }) => {
+    const charDiv = document.createElement("div");
+    charDiv.className = "char";
+
+    if (wrongCount > 0 && accuracy < 70) {
+      charDiv.classList.add("char-worst");
+    } else if (wrongCount > 0 && accuracy < 90) {
+      charDiv.classList.add("char-mid");
+    } else {
+      charDiv.classList.add("char-good");
+    }
+
+    charDiv.textContent = char;
+    charDiv.addEventListener("click", () => {
+      updateCharStatsDisplay(charIndex, passageResult);
+    });
+    charList.appendChild(charDiv);
+  });
+}
+
+function showToast(message: string): void {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+
+  toast.textContent = message;
+  toast.classList.add("visible");
+
+  if (toastTimeout) {
+    clearTimeout(toastTimeout);
+  }
+
+  toastTimeout = window.setTimeout(() => {
+    toast.classList.remove("visible");
+    toastTimeout = null;
+  }, 2000);
+}
+
+function hideToast(): void {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+
+  toast.classList.remove("visible");
+
+  if (toastTimeout) {
+    clearTimeout(toastTimeout);
+    toastTimeout = null;
+  }
+}
+
+async function loadNewPassage(): Promise<void> {
+  const weakestChars = sessionTracker.getWeakestChars(3);
+  await passageHandler.getPassage(weakestChars);
+
+  wordIndex = 0;
+  lastInput = "";
+  startingTime = -1;
+  typeTextBox.value = "";
+  resetTimePressedArray();
+
+  hideResults();
+  typeTextBox.focus();
+}
+
 function waitForKeystroke(): Promise<void> {
   return new Promise<void>((resolve) => {
     const handleKeystroke = (e: KeyboardEvent) => {
-      e.preventDefault();
-      window.removeEventListener('keydown', handleKeystroke);
-      resolve();
+      if (e.key === " ") {
+        e.preventDefault();
+        window.removeEventListener('keydown', handleKeystroke);
+        resolve();
+      }
     };
     window.addEventListener('keydown', handleKeystroke);
   });
@@ -196,7 +250,9 @@ function displayResults(passageResult: PassageResult): void {
   document.getElementById("correctWords")!.textContent = passageResult.correctWords.toString();
   document.getElementById("wrongWords")!.textContent = passageResult.wrongWords.toString();
 
+  generateSortedCharList(passageResult);
   updateCharStatsDisplay(0, passageResult);
+  showToast("Press spacebar to continue");
 
   const charList = document.getElementById("charList")!;
   const results = document.getElementById("results")!;
@@ -210,31 +266,14 @@ function displayResults(passageResult: PassageResult): void {
   });
 }
 
-function updateCharStatsDisplay(charIndex: number, passageResult?: PassageResult): void {
+function updateCharStatsDisplay(charIndex: number, passageResult: PassageResult): void {
   const charName = String.fromCharCode(65 + charIndex);
 
-  if (passageResult) {
-    document.getElementById("charName")!.textContent = charName;
-    document.getElementById("charSpeed")!.textContent = passageResult.charSpeeds[charIndex].toString();
-    document.getElementById("charAccuracy")!.textContent = passageResult.charAccuracies[charIndex].toString() + "%";
-    document.getElementById("correctChars")!.textContent = passageResult.correctChars[charIndex].toString();
-    document.getElementById("wrongChars")!.textContent = passageResult.wrongChars[charIndex].toString();
-  } else {
-    const sessionSummary = sessionTracker.getSessionSummary();
-    const charStats = sessionSummary.characterStats.get(charName);
-
-    if (charStats) {
-      const total = charStats.correct + charStats.wrong;
-      const speed = charStats.correct > 0 ? Math.floor(charStats.correct / (charStats.totalTime / 60000)) : 0;
-      const accuracy = total > 0 ? Math.floor((charStats.correct / total) * 100) : 0;
-
-      document.getElementById("charName")!.textContent = charName;
-      document.getElementById("charSpeed")!.textContent = speed.toString();
-      document.getElementById("charAccuracy")!.textContent = accuracy.toString() + "%";
-      document.getElementById("correctChars")!.textContent = charStats.correct.toString();
-      document.getElementById("wrongChars")!.textContent = charStats.wrong.toString();
-    }
-  }
+  document.getElementById("charName")!.textContent = charName;
+  document.getElementById("charSpeed")!.textContent = passageResult.charSpeeds[charIndex].toString();
+  document.getElementById("charAccuracy")!.textContent = passageResult.charAccuracies[charIndex].toString() + "%";
+  document.getElementById("correctChars")!.textContent = passageResult.correctChars[charIndex].toString();
+  document.getElementById("wrongChars")!.textContent = passageResult.wrongChars[charIndex].toString();
 }
 
 function hideResults(): void {
@@ -251,6 +290,8 @@ function hideResults(): void {
 }
 
 async function hideResultsAndContinue(): Promise<void> {
+  hideToast();
+
   const charList = document.getElementById("charList")!;
   const results = document.getElementById("results")!;
 
