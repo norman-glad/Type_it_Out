@@ -19,22 +19,6 @@ Browser-based typing speed trainer with adaptive word selection. A fully static 
 - CSS Variables for easy theming
 - localStorage for session persistence
 
-## Quick Start
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-```
-
 ## How It Works
 
 1. **Start typing**: Words appear one at a time. Type them correctly and press space to continue.
