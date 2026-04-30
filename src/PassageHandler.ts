@@ -167,7 +167,17 @@ export class PassageHandler {
       return false;
   }
 
-  public reset(): void {
-    this.passageCount = 0;
+  public scrollToCurrentWord(wordIndex: number): void {
+    if (wordIndex >= this.wordTags.length) return;
+
+    const wordTag = this.wordTags[wordIndex];
+    const typeText = document.querySelector("#typeText") as HTMLElement;
+
+    if (!typeText || !wordTag) return;
+
+    const lineHeight = wordTag.offsetHeight * 1.8;
+    const targetScrollTop = wordTag.offsetTop - lineHeight;
+
+    typeText.scrollTop = Math.max(0, targetScrollTop);
   }
 }

@@ -41,11 +41,6 @@ async function initialize(): Promise<void> {
         loadNewPassage();
         showToast("Passage restarted");
       }
-    } else if (e.key === 'r' || e.key === 'R') {
-      e.preventDefault();
-      sessionTracker.reset();
-      loadNewPassage();
-      showToast("Session reset");
     }
   });
 }
@@ -80,6 +75,7 @@ function onInput(e: Event): void {
     if (wordIndex >= passageHandler.wordArray.length - 1 || passageHandler.isNewLineStarting(wordIndex)) {
       passageHandler.hideWordTagsUntilIndex(wordIndex);
       target.value = "";
+      passageHandler.scrollToCurrentWord(wordIndex + 1);
     }
 
     moveToNextWord(userInput.substr(0, userInput.length - 1));
@@ -220,6 +216,7 @@ async function loadNewPassage(): Promise<void> {
 
   hideResults();
   showTypingPlace();
+  passageHandler.scrollToCurrentWord(0);
   typeTextBox.focus();
 }
 
@@ -261,6 +258,7 @@ function moveToNextWord(userInput: string): void {
   }
 
   passageHandler.formatWordTagAsCurrent(wordIndex);
+  passageHandler.scrollToCurrentWord(wordIndex);
 }
 
 async function finishPassage(): Promise<void> {

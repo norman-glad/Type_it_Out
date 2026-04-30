@@ -120,9 +120,4 @@ export class SessionTracker {
       characterStats
     };
   }
-
-  public reset(): void {
-    this.stats.clear();
-    localStorage.removeItem(this.storageKey);
-  }
 }
