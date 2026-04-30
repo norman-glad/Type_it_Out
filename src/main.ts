@@ -382,8 +382,8 @@ function setupThemeToggle(): void {
 
 function toggleTheme(): void {
   const isDark = !document.body.classList.contains('light-mode');
-  applyTheme(isDark);
-  localStorage.setItem('theme-preference', isDark ? 'dark' : 'light');
+  applyTheme(!isDark);
+  localStorage.setItem('theme-preference', !isDark ? 'dark' : 'light');
 }
 
 function applyTheme(isDark: boolean): void {
