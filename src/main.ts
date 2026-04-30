@@ -23,6 +23,8 @@ async function initialize(): Promise<void> {
     return;
   }
 
+  loadThemePreference();
+  setupThemeToggle();
   setupWordCountSelector();
   resetTimePressedArray();
   typeTextBox.addEventListener("input", onInput);
@@ -33,6 +35,17 @@ async function initialize(): Promise<void> {
     if (e.key === 'Tab') {
       e.preventDefault();
       typeTextBox.focus();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      if (!isViewingResults) {
+        loadNewPassage();
+        showToast("Passage restarted");
+      }
+    } else if (e.key === 'r' || e.key === 'R') {
+      e.preventDefault();
+      sessionTracker.reset();
+      loadNewPassage();
+      showToast("Session reset");
     }
   });
 }
@@ -103,7 +116,7 @@ function resetTimePressedArray(): void {
 }
 
 function setupWordCountSelector(): void {
-  const buttons = document.querySelectorAll('.wc-btn') as NodeListOf<HTMLButtonElement>;
+  const buttons = document.querySelectorAll('.wc-btn:not(#themeToggle)') as NodeListOf<HTMLButtonElement>;
 
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -349,6 +362,57 @@ async function hideResultsAndContinue(): Promise<void> {
   showTypingPlace();
 
   await loadNewPassage();
+}
+
+function loadThemePreference(): void {
+  const savedTheme = localStorage.getItem('theme-preference');
+  if (savedTheme === 'light') {
+    applyTheme(false);
+  } else {
+    applyTheme(true);
+  }
+}
+
+function setupThemeToggle(): void {
+  const themeToggle = document.getElementById("themeToggle") as HTMLButtonElement;
+  if (!themeToggle) return;
+
+  themeToggle.addEventListener("click", toggleTheme);
+}
+
+function toggleTheme(): void {
+  const isDark = !document.body.classList.contains('light-mode');
+  applyTheme(isDark);
+  localStorage.setItem('theme-preference', isDark ? 'dark' : 'light');
+}
+
+function applyTheme(isDark: boolean): void {
+  const body = document.body;
+  const themeToggle = document.getElementById("themeToggle") as HTMLButtonElement;
+
+  if (isDark) {
+    body.classList.remove('light-mode');
+    if (themeToggle) {
+      themeToggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2"></path>
+        <path d="M12 20v2"></path>
+        <path d="M4.93 4.93l1.41 1.41"></path>
+        <path d="M17.66 17.66l1.41 1.41"></path>
+        <path d="M2 12h2"></path>
+        <path d="M20 12h2"></path>
+        <path d="M6.34 17.66l-1.41 1.41"></path>
+        <path d="M19.07 4.93l-1.41 1.41"></path>
+      </svg>`;
+    }
+  } else {
+    body.classList.add('light-mode');
+    if (themeToggle) {
+      themeToggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>`;
+    }
+  }
 }
 
 document.addEventListener('DOMContentLoaded', initialize);
